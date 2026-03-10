@@ -1,0 +1,46 @@
+# Virtual environments
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Data
+backend/data/
+*.db
+*.sqlite3
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+
+# Build
+dist/
+build/
+*.egg-info/
+node_modules/
+
+# Design reference (not needed in prod)
+design.html
+
+# Gemini/Agent files
+.gemini/
+.agent/
+.agents/
+.claude/

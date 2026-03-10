@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Open IoT - Device Details">
+    <title>Open IoT – Device</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+    <div class="app-layout">
+
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-title">Open<span>IoT</span></div>
+                <div class="logo-sub">Vendor-Free Platform</div>
+            </div>
+            <div class="sidebar-nav">
+                <div class="nav-section">Core</div>
+                <a href="/dashboard" class="nav-item">
+                    <span class="nav-icon">⬡</span> Dashboard
+                </a>
+                <a href="/add-device" class="nav-item">
+                    <span class="nav-icon">◈</span> Add Device
+                </a>
+            </div>
+            <div class="sidebar-user">
+                <div class="user-info">
+                    <div class="user-avatar" id="user-avatar">U</div>
+                    <div class="user-details">
+                        <div class="name" id="user-name">User</div>
+                        <div class="email" id="user-email">user@email.com</div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main -->
+        <main class="main-content">
+            <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+
+            <div class="topbar">
+                <div class="topbar-title">
+                    Device
+                    <span>/ details</span>
+                </div>
+                <a href="/dashboard" class="topbar-btn">← Back to Dashboard</a>
+                <button class="topbar-btn" onclick="sendTestCommand()" style="color: var(--accent);">⚡ Send
+                    Command</button>
+                <button class="topbar-btn" onclick="deleteDevice()" style="color: var(--offline);">🗑 Delete</button>
+            </div>
+
+            <div class="content">
+
+                <!-- Device Header -->
+                <div class="device-detail-header">
+                    <div class="device-detail-icon" id="device-icon">📡</div>
+                    <div>
+                        <h2 id="device-title" style="color: var(--text-bright); margin-bottom: 4px;">Loading...</h2>
+                        <div class="flex items-center gap-2">
+                            <div class="device-status">
+                                <span class="status-dot" id="status-dot"></span>
+                                <span id="status-text">–</span>
+                            </div>
+                            <span class="text-muted text-xs" id="device-type-label">–</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Sensor Data -->
+                <div class="panel-header"
+                    style="padding: 0 0 12px; border-bottom: 1px solid var(--border); margin-bottom: 14px;">
+                    <div class="panel-title">📡 Live Sensor Data</div>
+                </div>
+                <div class="sensor-grid" id="sensor-grid">
+                    <div class="empty-state" id="sensor-empty" style="padding: 32px;">
+                        <div class="empty-icon">📊</div>
+                        <h3>No sensor data yet</h3>
+                        <p class="text-sm">Sensor readings will appear here once your device starts sending data.</p>
+                    </div>
+                </div>
+
+                <!-- Device Info -->
+                <div class="panel-header"
+                    style="padding: 0 0 12px; border-bottom: 1px solid var(--border); margin-bottom: 14px; margin-top: 24px;">
+                    <div class="panel-title">ℹ️ Device Information</div>
+                </div>
+                <div class="card">
+                    <div class="params-box" style="background: transparent; border: none; padding: 0; margin-top: 0;">
+                        <div class="param-row">
+                            <span class="label">Device ID</span>
+                            <span class="value" id="info-device-id">–</span>
+                        </div>
+                        <div class="param-row">
+                            <span class="label">Firmware</span>
+                            <span class="value" id="info-firmware">–</span>
+                        </div>
+                        <div class="param-row">
+                            <span class="label">IP Address</span>
+                            <span class="value" id="info-ip">–</span>
+                        </div>
+                        <div class="param-row">
+                            <span class="label">MAC Address</span>
+                            <span class="value" id="info-mac">–</span>
+                        </div>
+                        <div class="param-row">
+                            <span class="label">Chip Model</span>
+                            <span class="value" id="info-chip">–</span>
+                        </div>
+                        <div class="param-row">
+                            <span class="label">Last Seen</span>
+                            <span class="value" id="info-last-seen">–</span>
+                        </div>
+                        <div class="param-row">
+                            <span class="label">Created</span>
+                            <span class="value" id="info-created">–</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/device.js"></script>
+</body>
+
+</html>

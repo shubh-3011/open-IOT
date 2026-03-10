@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Open IoT Dashboard - Manage your IoT devices">
+    <title>Open IoT – Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+    <div class="app-layout">
+
+        <!-- ═══ SIDEBAR ═══ -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-title">Open<span>IoT</span></div>
+                <div class="logo-sub">Vendor-Free Platform</div>
+            </div>
+
+            <div class="sidebar-nav">
+                <div class="nav-section">Core</div>
+                <a href="/dashboard" class="nav-item active">
+                    <span class="nav-icon">⬡</span> Dashboard
+                </a>
+                <a href="/add-device" class="nav-item">
+                    <span class="nav-icon">◈</span> Devices <span class="nav-badge" id="nav-device-count">0</span>
+                </a>
+                <a href="#" class="nav-item" onclick="event.preventDefault()">
+                    <span class="nav-icon">⌁</span> Telemetry
+                </a>
+
+                <div class="nav-section">System</div>
+                <a href="#" class="nav-item" onclick="event.preventDefault()">
+                    <span class="nav-icon">⊞</span> MQTT Broker
+                </a>
+                <a href="/docs" class="nav-item">
+                    <span class="nav-icon">📖</span> API Docs
+                </a>
+                <a href="#" class="nav-item" onclick="event.preventDefault()">
+                    <span class="nav-icon">⚙</span> Settings
+                </a>
+            </div>
+
+            <div class="sidebar-user">
+                <div class="user-info">
+                    <div class="user-avatar" id="user-avatar">U</div>
+                    <div class="user-details">
+                        <div class="name" id="user-name">User</div>
+                        <div class="email" id="user-email">user@email.com</div>
+                    </div>
+                </div>
+                <button class="nav-item mt-4" onclick="logout()" style="color: var(--offline); padding-left: 0;">
+                    <span class="nav-icon">⏻</span> Sign Out
+                </button>
+            </div>
+        </nav>
+
+        <!-- ═══ MAIN ═══ -->
+        <main class="main-content">
+            <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+
+            <!-- Topbar -->
+            <div class="topbar">
+                <div class="topbar-title">
+                    Dashboard
+                    <span>/ overview</span>
+                </div>
+                <div class="status-pill" id="mqtt-status">
+                    <div class="dot"></div>
+                    <span>WebSocket Connected</span>
+                </div>
+                <a href="/add-device" class="topbar-btn">+ Add Device</a>
+            </div>
+
+            <div class="content">
+
+                <!-- ═══ STAT CARDS ═══ -->
+                <div class="stats-row">
+                    <div class="stat-card c1">
+                        <div class="stat-label">Total Devices</div>
+                        <div class="stat-value" id="stat-total">–</div>
+                        <div class="stat-sub" id="stat-total-sub"></div>
+                    </div>
+                    <div class="stat-card c2">
+                        <div class="stat-label">Online Now</div>
+                        <div class="stat-value" id="stat-online">–</div>
+                        <div class="stat-sub" id="stat-online-sub"></div>
+                    </div>
+                    <div class="stat-card c3">
+                        <div class="stat-label">Adopted</div>
+                        <div class="stat-value" id="stat-adopted">–</div>
+                        <div class="stat-sub" id="stat-adopted-sub"></div>
+                    </div>
+                    <div class="stat-card c4">
+                        <div class="stat-label">Readings (24h)</div>
+                        <div class="stat-value" id="stat-readings">–</div>
+                        <div class="stat-sub">data points</div>
+                    </div>
+                </div>
+
+                <!-- ═══ CHARTS ROW ═══ -->
+                <div class="charts-row" id="charts-row">
+                    <!-- Populated by JS when devices have sensor data -->
+                    <div class="chart-panel">
+                        <div class="chart-title">No sensor data yet</div>
+                        <div class="chart-val" style="color:var(--text-dim); font-size:16px;">Add a device to see
+                            telemetry</div>
+                    </div>
+                </div>
+
+                <!-- ═══ MAIN GRID: Device Table + Activity Feed ═══ -->
+                <div class="main-grid">
+
+                    <!-- Device Table -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Connected Devices</div>
+                            <a href="/add-device" class="panel-action">+ Add New →</a>
+                        </div>
+                        <div class="device-list" id="device-list">
+                            <div class="device-row header">
+                                <div></div>
+                                <div>Device</div>
+                                <div>Status</div>
+                                <div>Telemetry</div>
+                                <div>Type</div>
+                                <div></div>
+                            </div>
+                            <!-- Device rows populated by JS -->
+                            <div id="device-empty" class="empty-state" style="padding: 40px;">
+                                <div class="empty-icon">📡</div>
+                                <h3>No devices yet</h3>
+                                <p>Add your first IoT device to get started.</p>
+                                <a href="/add-device" class="btn btn-primary">+ Add Device</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activity Feed -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Live Activity</div>
+                            <button class="panel-action" onclick="clearActivity()">Clear</button>
+                        </div>
+                        <div class="activity-feed" id="activity-feed">
+                            <div class="activity-item">
+                                <div class="activity-time">–</div>
+                                <div class="activity-dot-wrap">
+                                    <div class="activity-dot" style="background:var(--text-dim)"></div>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-msg">Waiting for device activity...</div>
+                                    <div class="activity-device">System</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ═══ BOTTOM ROW: Terminal + Onboarding ═══ -->
+                <div class="bottom-row">
+
+                    <!-- Terminal -->
+                    <div class="terminal">
+                        <div class="terminal-bar">
+                            <div class="t-dot" style="background:#ff5f56"></div>
+                            <div class="t-dot" style="background:#ffbd2e"></div>
+                            <div class="t-dot" style="background:#27c93f"></div>
+                            <div class="terminal-title">MQTT · LIVE STREAM</div>
+                        </div>
+                        <div class="terminal-body" id="terminal-body">
+                            <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd"> subscribe
+                                    openiot/+/state</span></div>
+                            <div class="t-out t-info">⏳ Waiting for MQTT data...</div>
+                            <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd"> </span><span
+                                    class="t-cursor"></span></div>
+                        </div>
+                    </div>
+
+                    <!-- QR Onboarding -->
+                    <div class="onboard-panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Device Onboarding</div>
+                        </div>
+                        <div class="onboard-inner">
+                            <div class="onboard-title">Quick Connect</div>
+                            <div class="onboard-desc">
+                                Add a device, flash the firmware, and your ESP will automatically connect via MQTT.
+                            </div>
+
+                            <div class="onboard-steps">
+                                <div class="onboard-step">
+                                    <div class="step-num">1</div> Create device on dashboard → get QR code
+                                </div>
+                                <div class="onboard-step">
+                                    <div class="step-num">2</div> Flash ESP firmware with OpenIoT sketch
+                                </div>
+                                <div class="onboard-step">
+                                    <div class="step-num">3</div> ESP creates WiFi AP → enter credentials
+                                </div>
+                                <div class="onboard-step">
+                                    <div class="step-num">4</div> Device auto-adopts and appears live
+                                </div>
+                            </div>
+
+                            <a href="/add-device" class="onboard-btn">+ Add New Device</a>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/dashboard.js"></script>
+</body>
+
+</html>
