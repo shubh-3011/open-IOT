@@ -87,6 +87,7 @@ async def create_device(
         is_adopted=False,
     )
     db.add(device)
+    db.flush()  # Ensure device exists before FK reference
 
     # Create adoption token (valid for 24 hours)
     token = AdoptionToken(
