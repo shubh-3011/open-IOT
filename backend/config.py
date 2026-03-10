@@ -1,6 +1,10 @@
 """Open IoT Platform - Configuration."""
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv()
 
 # Base paths
 BASE_DIR = Path(__file__).resolve().parent
@@ -11,11 +15,8 @@ DATA_DIR.mkdir(exist_ok=True)
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")
 
-# Database – Supabase PostgreSQL (Transaction mode pooler on port 6543)
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    ""
-)
+# Database
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./data/openiot.db")
 
 # JWT Auth
 SECRET_KEY = os.getenv("SECRET_KEY", "openiot-dev-secret-change-in-production")
@@ -34,8 +35,6 @@ SERVER_PORT = int(os.getenv("SERVER_PORT", "8000"))
 SERVER_URL = os.getenv("SERVER_URL", "http://localhost:8000")
 
 # MQTT Topic patterns
-# Devices publish to: openiot/{device_id}/state
-# Devices subscribe to: openiot/{device_id}/command
 MQTT_TOPIC_STATE = "openiot/{device_id}/state"
 MQTT_TOPIC_COMMAND = "openiot/{device_id}/command"
 MQTT_TOPIC_AVAILABILITY = "openiot/{device_id}/availability"
