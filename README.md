@@ -65,7 +65,7 @@
 
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_USERNAME/open-iot.git
+git clone https://github.com/shubh-3011/open-iot.git
 cd open-iot
 
 # Create virtual environment
