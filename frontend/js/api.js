@@ -190,3 +190,20 @@ function connectWebSocket(onMessage) {
         ws.close();
     };
 }
+
+// ── Export functions globally ───────────────────────────────
+// Make all functions globally accessible for inline scripts
+window.api = api;
+window.apiForm = apiForm;
+window.getToken = getToken;
+window.setToken = setToken;
+window.removeToken = removeToken;
+window.getUser = getUser;
+window.setUser = setUser;
+window.requireAuth = requireAuth;
+window.logout = logout;
+window.showToast = showToast;
+window.toggleSidebar = toggleSidebar;
+window.loadUserInfo = loadUserInfo;
+window.connectWebSocket = connectWebSocket;
+window.getDeviceIcon = getDeviceIcon;

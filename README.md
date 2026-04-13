@@ -43,13 +43,62 @@
 
 ### How It Works
 
-1. **User creates a device** on the dashboard → backend generates device ID, MQTT credentials, and a QR code
-2. **User flashes ESP firmware** → ESP creates a WiFi AP named `OpenIoT-Setup`
-3. **User connects to the AP** → enters WiFi credentials + device parameters (from QR or manual)
-4. **ESP connects to WiFi** → calls `POST /api/devices/adopt` with adoption token
-5. **ESP connects to MQTT** → publishes sensor data to `openiot/{device_id}/state`
-6. **Backend receives MQTT data** → stores in database + broadcasts via WebSocket
-7. **Dashboard updates in real-time** → sensor values, charts, and activity feed refresh live
+#### Complete Onboarding Flow
+
+**Step 1: Create Device on Dashboard**
+- User goes to `/add-device` page
+- Fills in device name and type (ESP32, ESP8266, etc.)
+- Backend generates:
+  - Unique `device_id` (e.g., `dev_abc123`)
+  - MQTT credentials (username/password)
+  - Single-use `adoption_token`
+  - QR code containing device_id, token, server URL, MQTT settings
+
+**Step 2: Choose Capture Mode**
+
+**Mode A: Backend-Generated QR (ESP scans QR)**
+- User shows QR code to ESP32-CAM device
+- ESP's camera scans the QR automatically
+- ESP extracts credentials and begins self-configuration
+
+**Mode B: ESP-Generated QR (User scans QR with phone)**
+- User flashes ESP with firmware
+- ESP creates `OpenIoT-Setup` WiFi AP
+- User connects phone to ESP's WiFi, opens captive portal
+- User selects "QR Generation" mode
+- ESP displays QR code containing device_id, token
+- User captures QR with phone camera
+- User goes back to dashboard, selects "Scan QR from ESP"
+- User uploads QR screenshot or manually enters data
+- Backend validates token and adopts device
+
+**Mode C: Manual Entry**
+- User flashes ESP with firmware
+- ESP creates `OpenIoT-Setup` WiFi AP
+- User connects, enters WiFi credentials
+- User selects "Manual Entry" mode
+- User manually types in: Server URL, Device ID, Token, MQTT settings
+- ESP saves configuration and adopts itself
+
+**Step 3: Device Adoption**
+- ESP connects to WiFi
+- ESP calls `POST /api/devices/adopt` with adoption token
+- Backend validates token (checks expiry, single-use)
+- Device marked as `is_adopted = True`
+- ESP receives MQTT credentials
+- ESP connects to MQTT broker
+
+**Step 4: Live Monitoring**
+- ESP publishes sensor data to `openiot/{device_id}/state` every 10 seconds
+- Backend receives MQTT data, stores in database
+- WebSocket broadcasts updates to dashboard
+- Dashboard displays real-time sensor values, charts, activity feed
+
+**Step 5: Device Control**
+- User sends commands from dashboard (ping, restart, LED control)
+- Commands published to `openiot/{device_id}/command`
+- ESP receives commands, executes, responds
+- Dashboard updates in real-time
 
 ---
 
@@ -150,6 +199,40 @@ open-iot/
 - [PubSubClient](https://github.com/knolleary/pubsubclient) — MQTT client
 - [ArduinoJson](https://github.com/bblanchon/ArduinoJson) — JSON parsing
 - HTTPClient (built-in)
+- WebServer (built-in for ESP32/ESP8266)
+
+### Dual-Mode Captive Portal
+
+The ESP firmware supports **two setup modes**:
+
+#### Mode 1: Manual Entry
+1. ESP creates `OpenIoT-Setup` WiFi AP
+2. User connects phone to AP, opens captive portal
+3. User selects "Manual Entry" mode
+4. User enters:
+   - Server URL (e.g., `http://your-server:8000`)
+   - Device ID (e.g., `dev_abc123`)
+   - Adoption Token (from web dashboard)
+   - MQTT Host, Port, Username, Password
+5. ESP saves settings and adopts itself automatically
+
+#### Mode 2: QR Code Generation
+1. ESP creates `OpenIoT-Setup` WiFi AP
+2. User connects, selects "QR Generation" mode
+3. ESP displays a QR code containing:
+   - Server URL
+   - Device ID
+   - Adoption Token
+   - MQTT Host + Port
+4. User captures QR code (screenshot/phone camera)
+5. User goes to web dashboard, selects "Scan QR from ESP"
+6. User uploads QR screenshot or manually enters data
+7. Backend validates and completes adoption
+
+**This flow enables:**
+- **ESP32-CAM devices** to scan QR codes directly with their camera
+- **Standard ESP32/ESP8266** to display QR codes for user to capture
+- **Flexible onboarding** for different hardware capabilities
 
 ### Customizing Sensors
 

@@ -21,19 +21,22 @@ logging.basicConfig(
 logger = logging.getLogger("openiot")
 
 # ── Frontend path ────────────────────────────────────────────────────────────
-FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
+# Try Docker path first, then fallback to local repo layout
+FRONTEND_DIR = Path("/app/frontend")
+if not FRONTEND_DIR.exists():
+    FRONTEND_DIR = Path(__file__).parent.parent / "frontend"
 
 
 # ── App lifecycle ────────────────────────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("🚀 Open IoT Platform starting...")
+    logger.info("Open IoT Platform starting...")
     init_db()
-    logger.info("✅ Database initialized")
+    logger.info("Database initialized")
     start_mqtt()
     yield
     stop_mqtt()
-    logger.info("👋 Open IoT Platform stopped")
+    logger.info("Open IoT Platform stopped")
 
 
 # ── FastAPI App ──────────────────────────────────────────────────────────────
@@ -53,6 +56,36 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ── Serve frontend static files ────────────────────────────────────────────
+if FRONTEND_DIR.exists():
+    print(f"Frontend directory found: {FRONTEND_DIR}")
+    app.mount("/css", StaticFiles(directory=FRONTEND_DIR / "css"), name="css")
+    app.mount("/js", StaticFiles(directory=FRONTEND_DIR / "js"), name="js")
+    app.mount("/assets", StaticFiles(directory=FRONTEND_DIR / "assets"), name="assets")
+
+    @app.get("/", include_in_schema=False)
+    async def serve_index():
+        print(f"Serving index.html from {FRONTEND_DIR / 'index.html'}")
+        return FileResponse(FRONTEND_DIR / "index.html")
+
+    @app.get("/dashboard", include_in_schema=False)
+    async def serve_dashboard():
+        print(f"Serving dashboard.html from {FRONTEND_DIR / 'dashboard.html'}")
+        return FileResponse(FRONTEND_DIR / "dashboard.html")
+
+    @app.get("/add-device", include_in_schema=False)
+    async def serve_add_device():
+        print(f"Serving add-device.html from {FRONTEND_DIR / 'add-device.html'}")
+        return FileResponse(FRONTEND_DIR / "add-device.html")
+
+    @app.get("/device/{device_id}", include_in_schema=False)
+    async def serve_device_page(device_id: str):
+        print(f"Serving device.html from {FRONTEND_DIR / 'device.html'}")
+        return FileResponse(FRONTEND_DIR / "device.html")
+
+else:
+    print(f"Frontend directory not found: {FRONTEND_DIR}")
+
 # ── Include API routers ─────────────────────────────────────────────────────
 app.include_router(auth_router.router)
 app.include_router(device_router.router)
@@ -69,29 +102,6 @@ async def get_me(user=Depends(get_current_user)):
         "email": user.email,
         "display_name": user.display_name,
     }
-
-
-# ── Serve frontend static files ─────────────────────────────────────────────
-if FRONTEND_DIR.exists():
-    app.mount("/css", StaticFiles(directory=FRONTEND_DIR / "css"), name="css")
-    app.mount("/js", StaticFiles(directory=FRONTEND_DIR / "js"), name="js")
-    app.mount("/assets", StaticFiles(directory=FRONTEND_DIR / "assets"), name="assets")
-
-    @app.get("/", include_in_schema=False)
-    async def serve_index():
-        return FileResponse(FRONTEND_DIR / "index.html")
-
-    @app.get("/dashboard", include_in_schema=False)
-    async def serve_dashboard():
-        return FileResponse(FRONTEND_DIR / "dashboard.html")
-
-    @app.get("/add-device", include_in_schema=False)
-    async def serve_add_device():
-        return FileResponse(FRONTEND_DIR / "add-device.html")
-
-    @app.get("/device/{device_id}", include_in_schema=False)
-    async def serve_device_page(device_id: str):
-        return FileResponse(FRONTEND_DIR / "device.html")
 
 
 # ── Run with uvicorn ─────────────────────────────────────────────────────────

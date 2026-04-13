@@ -22,13 +22,13 @@ services:
     container_name: openiot-api
     ports:
       - "8000:8000"
+    env_file:
+      - ./backend/.env
     environment:
+      # MQTT points to the compose mqtt service (overrides .env)
       - MQTT_BROKER_HOST=mqtt
       - MQTT_BROKER_PORT=1883
-      - MQTT_USERNAME=openiot
-      - MQTT_PASSWORD=openiot123
       - SERVER_URL=http://localhost:8000
-      - SECRET_KEY=change-this-in-production
     volumes:
       - ./frontend:/app/frontend
       - api_data:/app/data

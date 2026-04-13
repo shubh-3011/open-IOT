@@ -9,6 +9,7 @@ from database import get_db, Device, AdoptionToken, User
 from auth import get_current_user
 from qr_generator import generate_adoption_qr
 from mqtt_client import device_states, publish_command
+from config import SERVER_URL, MQTT_BROKER_HOST, MQTT_BROKER_PORT
 
 router = APIRouter(prefix="/api/devices", tags=["devices"])
 
@@ -18,6 +19,8 @@ router = APIRouter(prefix="/api/devices", tags=["devices"])
 class CreateDeviceRequest(BaseModel):
     name: str = "New Device"
     device_type: str = "esp32"
+    server_url: str | None = None
+    mqtt_host: str | None = None
 
 
 class AdoptRequest(BaseModel):
@@ -32,6 +35,22 @@ class AdoptRequest(BaseModel):
 class CommandRequest(BaseModel):
     command: str
     params: dict = {}
+
+
+class QrScanRequest(BaseModel):
+    """Scanned QR data from ESP device."""
+    server: str
+    mqtt_host: str
+    mqtt_port: int
+    device_id: str
+    token: str
+
+
+class QrScanResult(BaseModel):
+    """Result of QR scanning."""
+    status: str
+    device_id: str | None = None
+    message: str | None = None
 
 
 # ── Endpoints ────────────────────────────────────────────────────────────────
@@ -100,12 +119,17 @@ async def create_device(
     db.commit()
     db.refresh(device)
 
+    final_server_url = req.server_url or SERVER_URL
+    final_mqtt_host = req.mqtt_host or MQTT_BROKER_HOST
+
     # Generate QR code
     qr_image = generate_adoption_qr(
         device_id=device_id,
         adoption_token=adoption_token,
         mqtt_username=mqtt_username,
         mqtt_password=mqtt_password,
+        server_url=final_server_url,
+        mqtt_host=final_mqtt_host,
     )
 
     return {
@@ -115,10 +139,16 @@ async def create_device(
         "adoption_token": adoption_token,
         "mqtt_username": mqtt_username,
         "mqtt_password": mqtt_password,
+        "server_url": final_server_url,
+        "mqtt_host": final_mqtt_host,
+        "mqtt_port": MQTT_BROKER_PORT,
         "qr_code": qr_image,
         "manual_params": {
+            "server": final_server_url,
             "device_id": device_id,
             "token": adoption_token,
+            "mqtt_host": final_mqtt_host,
+            "mqtt_port": MQTT_BROKER_PORT,
             "mqtt_user": mqtt_username,
             "mqtt_pass": mqtt_password,
         },
@@ -174,6 +204,97 @@ async def adopt_device(
             "availability": f"openiot/{device.device_id}/availability",
         },
     }
+
+
+@router.post("/adopt-from-qr")
+async def adopt_device_from_qr(
+    req: QrScanRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Called by the frontend when user scans QR code from ESP device.
+    The QR contains device_id and token from the ESP.
+    No auth required — validates against adoption token.
+
+    Flow:
+    1. User creates device on backend → gets QR code with device_id, token
+    2. User flashes ESP, ESP displays QR with same device_id, token
+    3. User scans ESP QR with phone, uploads/sends data to backend
+    4. Backend validates token and adopts the device
+    """
+    # Find the adoption token
+    token = db.query(AdoptionToken).filter(
+        AdoptionToken.token == req.token,
+        AdoptionToken.device_id == req.device_id,
+        AdoptionToken.is_used == False,
+    ).first()
+
+    if not token:
+        raise HTTPException(400, "Invalid or expired adoption token")
+
+    if token.expires_at < datetime.now(timezone.utc):
+        raise HTTPException(400, "Adoption token has expired")
+
+    # Mark token as used
+    token.is_used = True
+
+    # Activate the device
+    device = db.query(Device).filter(Device.device_id == req.device_id).first()
+    if not device:
+        raise HTTPException(404, "Device not found")
+
+    device.is_adopted = True
+    device.last_seen = datetime.now(timezone.utc)
+
+    db.commit()
+
+    return QrScanResult(
+        status="adopted",
+        device_id=device.device_id,
+        message=f"Device {device.device_id} adopted successfully"
+    )
+
+
+@router.post("/adopt/manual")
+async def adopt_device_manual(
+    req: QrScanRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Called when user manually enters device credentials.
+    Similar to adopt-from-qr but without QR scanning.
+    """
+    # Find the adoption token
+    token = db.query(AdoptionToken).filter(
+        AdoptionToken.token == req.token,
+        AdoptionToken.device_id == req.device_id,
+        AdoptionToken.is_used == False,
+    ).first()
+
+    if not token:
+        raise HTTPException(400, "Invalid or expired adoption token")
+
+    if token.expires_at < datetime.now(timezone.utc):
+        raise HTTPException(400, "Adoption token has expired")
+
+    # Mark token as used
+    token.is_used = True
+
+    # Activate the device
+    device = db.query(Device).filter(Device.device_id == req.device_id).first()
+    if not device:
+        raise HTTPException(404, "Device not found")
+
+    device.is_adopted = True
+    device.last_seen = datetime.now(timezone.utc)
+
+    db.commit()
+
+    return QrScanResult(
+        status="adopted",
+        device_id=device.device_id,
+        message=f"Device {device.device_id} adopted successfully"
+    )
 
 
 @router.get("/{device_id}")

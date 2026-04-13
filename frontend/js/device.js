@@ -140,15 +140,18 @@ function renderSensors(state) {
 
 // ── Send Test Command ─────────────────────────────────────────────────────
 async function sendTestCommand() {
+    const cmd = prompt("Enter command to send to device (e.g. turn_on, turn_off, toggle, ping):", "ping");
+    if (!cmd) return; // User cancelled
+
     try {
         await api(`/api/devices/${DEVICE_ID}/command`, {
             method: 'POST',
             body: JSON.stringify({
-                command: 'ping',
+                command: cmd.trim(),
                 params: { timestamp: Date.now() },
             }),
         });
-        showToast('Command sent!', 'success');
+        showToast('Command sent: ' + cmd, 'success');
     } catch (err) {
         showToast('Failed: ' + err.message, 'error');
     }

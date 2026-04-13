@@ -16,8 +16,8 @@
         <!-- Sidebar -->
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-logo">
+                <div class="logo-icon">⚡</div>
                 <div class="logo-title">Open<span>IoT</span></div>
-                <div class="logo-sub">Vendor-Free Platform</div>
             </div>
             <div class="sidebar-nav">
                 <div class="nav-section">Core</div>
@@ -41,8 +41,6 @@
 
         <!-- Main -->
         <main class="main-content">
-            <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
-
             <div class="topbar">
                 <div class="topbar-title">
                     Device
@@ -60,13 +58,13 @@
                 <div class="device-detail-header">
                     <div class="device-detail-icon" id="device-icon">📡</div>
                     <div>
-                        <h2 id="device-title" style="color: var(--text-bright); margin-bottom: 4px;">Loading...</h2>
+                        <h2 id="device-title" style="color: var(--text-primary); margin-bottom: 4px;">Loading...</h2>
                         <div class="flex items-center gap-2">
                             <div class="device-status">
                                 <span class="status-dot" id="status-dot"></span>
                                 <span id="status-text">–</span>
                             </div>
-                            <span class="text-muted text-xs" id="device-type-label">–</span>
+                            <span class="text-muted text-xs" id="device-type-label" style="color: var(--text-tertiary);">–</span>
                         </div>
                     </div>
                 </div>
