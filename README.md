@@ -1,4 +1,4 @@
-# 🔌 Open IoT Platform
+# Open IoT Platform
 
 > **Self-hostable, vendor-free IoT device management platform.** Connect your ESP32/ESP8266 devices, visualize sensor data in real-time, and control everything from a modern cyberpunk dashboard.
 
@@ -10,35 +10,35 @@
 
 ---
 
-## ✨ Features
+## Features
 
-- 🔐 **User Authentication** — JWT-based signup/login with bcrypt password hashing
-- 📡 **Device Management** — Create, adopt, monitor, and control IoT devices
-- 📱 **QR Code Onboarding** — Generate QR codes for one-scan device setup
-- 📊 **Real-time Dashboard** — Live sensor data via WebSocket + MQTT bridge
-- 🎛️ **Device Commands** — Send commands (ping, restart, LED control) from dashboard
-- 🌐 **MQTT Integration** — Devices communicate via standard MQTT protocol
-- 🔧 **ESP Firmware Included** — Ready-to-flash Arduino sketch for ESP32/ESP8266
-- 🐳 **Docker Ready** — Deploy with `docker-compose up`
-- 🎨 **Cyberpunk UI** — Dark theme with grid overlays, scan lines, and micro-animations
+- **User Authentication** — JWT-based signup/login with bcrypt password hashing
+- **Device Management** — Create, adopt, monitor, and control IoT devices
+- **QR Code Onboarding** — Generate QR codes for one-scan device setup
+- **Real-time Dashboard** — Live sensor data via WebSocket + MQTT bridge
+- **Device Commands** — Send commands (ping, restart, LED control) from dashboard
+- **MQTT Integration** — Devices communicate via standard MQTT protocol
+- **ESP Firmware Included** — Ready-to-flash Arduino sketch for ESP32/ESP8266
+- **Docker Ready** — Deploy with `docker-compose up`
+- **Cyberpunk UI** — Dark theme with grid overlays, scan lines, and micro-animations
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
-┌──────────────┐     MQTT      ┌──────────────┐     HTTP/WS     ┌──────────────┐
-│  ESP Device  │ ◄───────────► │  MQTT Broker  │ ◄─────────────► │   FastAPI    │
-│  (Firmware)  │               │  (Mosquitto)  │                 │   Backend    │
-└──────────────┘               └──────────────┘                 └──────┬───────┘
-                                                                       │
-                                                                       │ REST API
-                                                                       │ WebSocket
-                                                                       │
-                                                                ┌──────▼───────┐
-                                                                │   Frontend   │
-                                                                │  (Dashboard) │
-                                                                └──────────────┘
+ MQTT HTTP/WS
+ ESP Device MQTT Broker FastAPI
+ (Firmware) (Mosquitto) Backend
+
+
+ REST API
+ WebSocket
+
+
+ Frontend
+ (Dashboard)
+
 ```
 
 ### How It Works
@@ -49,10 +49,10 @@
 - User goes to `/add-device` page
 - Fills in device name and type (ESP32, ESP8266, etc.)
 - Backend generates:
-  - Unique `device_id` (e.g., `dev_abc123`)
-  - MQTT credentials (username/password)
-  - Single-use `adoption_token`
-  - QR code containing device_id, token, server URL, MQTT settings
+ - Unique `device_id` (e.g., `dev_abc123`)
+ - MQTT credentials (username/password)
+ - Single-use `adoption_token`
+ - QR code containing device_id, token, server URL, MQTT settings
 
 **Step 2: Choose Capture Mode**
 
@@ -102,7 +102,7 @@
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -119,8 +119,8 @@ cd open-iot
 
 # Create virtual environment
 python -m venv .venv
-source .venv/bin/activate  # Linux/macOS
-# .venv\Scripts\Activate.ps1  # Windows PowerShell
+source .venv/bin/activate # Linux/macOS
+# .venv\Scripts\Activate.ps1 # Windows PowerShell
 
 # Install dependencies
 pip install -r backend/requirements.txt
@@ -147,51 +147,51 @@ This starts:
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 open-iot/
-├── backend/
-│   ├── main.py              # FastAPI app entry point
-│   ├── config.py             # Configuration (DB, MQTT, JWT)
-│   ├── database.py           # SQLAlchemy models & DB setup
-│   ├── auth.py               # JWT + bcrypt authentication
-│   ├── mqtt_client.py        # MQTT client (subscribe, publish, WS bridge)
-│   ├── qr_generator.py       # QR code generation for device adoption
-│   ├── requirements.txt      # Python dependencies
-│   └── routers/
-│       ├── auth_router.py    # /api/auth/* (register, login)
-│       ├── device_router.py  # /api/devices/* (CRUD, adopt, commands)
-│       ├── data_router.py    # /api/data/* (sensor history, stats)
-│       └── ws_router.py      # /ws (WebSocket for live updates)
-│
-├── frontend/
-│   ├── index.html            # Login / Register page
-│   ├── dashboard.html        # Main dashboard
-│   ├── add-device.html       # Device onboarding (3-step wizard)
-│   ├── device.html           # Individual device detail page
-│   ├── css/style.css         # Design system (cyberpunk dark theme)
-│   └── js/
-│       ├── api.js            # API client, auth, WebSocket, utilities
-│       ├── auth.js           # Login/register form handlers
-│       ├── dashboard.js      # Dashboard rendering + live updates
-│       ├── add-device.js     # Device creation + QR generation
-│       └── device.js         # Device detail page logic
-│
-├── esp_firmware/
-│   └── open_iot_esp/
-│       └── open_iot_esp.ino  # Arduino sketch for ESP32/ESP8266
-│
-├── mosquitto/
-│   └── mosquitto.conf        # MQTT broker configuration
-│
-├── docker-compose.yml        # Docker deployment
-└── README.md
+ backend/
+ main.py # FastAPI app entry point
+ config.py # Configuration (DB, MQTT, JWT)
+ database.py # SQLAlchemy models & DB setup
+ auth.py # JWT + bcrypt authentication
+ mqtt_client.py # MQTT client (subscribe, publish, WS bridge)
+ qr_generator.py # QR code generation for device adoption
+ requirements.txt # Python dependencies
+ routers/
+ auth_router.py # /api/auth/* (register, login)
+ device_router.py # /api/devices/* (CRUD, adopt, commands)
+ data_router.py # /api/data/* (sensor history, stats)
+ ws_router.py # /ws (WebSocket for live updates)
+
+ frontend/
+ index.html # Login / Register page
+ dashboard.html # Main dashboard
+ add-device.html # Device onboarding (3-step wizard)
+ device.html # Individual device detail page
+ css/style.css # Design system (cyberpunk dark theme)
+ js/
+ api.js # API client, auth, WebSocket, utilities
+ auth.js # Login/register form handlers
+ dashboard.js # Dashboard rendering + live updates
+ add-device.js # Device creation + QR generation
+ device.js # Device detail page logic
+
+ esp_firmware/
+ open_iot_esp/
+ open_iot_esp.ino # Arduino sketch for ESP32/ESP8266
+
+ mosquitto/
+ mosquitto.conf # MQTT broker configuration
+
+ docker-compose.yml # Docker deployment
+ README.md
 ```
 
 ---
 
-## 📡 ESP Device Setup
+## ESP Device Setup
 
 ### Required Arduino Libraries
 
@@ -210,20 +210,20 @@ The ESP firmware supports **two setup modes**:
 2. User connects phone to AP, opens captive portal
 3. User selects "Manual Entry" mode
 4. User enters:
-   - Server URL (e.g., `http://your-server:8000`)
-   - Device ID (e.g., `dev_abc123`)
-   - Adoption Token (from web dashboard)
-   - MQTT Host, Port, Username, Password
+ - Server URL (e.g., `http://your-server:8000`)
+ - Device ID (e.g., `dev_abc123`)
+ - Adoption Token (from web dashboard)
+ - MQTT Host, Port, Username, Password
 5. ESP saves settings and adopts itself automatically
 
 #### Mode 2: QR Code Generation
 1. ESP creates `OpenIoT-Setup` WiFi AP
 2. User connects, selects "QR Generation" mode
 3. ESP displays a QR code containing:
-   - Server URL
-   - Device ID
-   - Adoption Token
-   - MQTT Host + Port
+ - Server URL
+ - Device ID
+ - Adoption Token
+ - MQTT Host + Port
 4. User captures QR code (screenshot/phone camera)
 5. User goes to web dashboard, selects "Scan QR from ESP"
 6. User uploads QR screenshot or manually enters data
@@ -240,17 +240,17 @@ Edit the `publishState()` function in the firmware to read your actual sensors:
 
 ```cpp
 void publishState() {
-  JsonDocument doc;
+ JsonDocument doc;
 
-  // Replace with your real sensors:
-  doc["temperature"] = dht.readTemperature();
-  doc["humidity"]    = dht.readHumidity();
-  doc["soil"]        = analogRead(A0);
+ // Replace with your real sensors:
+ doc["temperature"] = dht.readTemperature();
+ doc["humidity"] = dht.readHumidity();
+ doc["soil"] = analogRead(A0);
 
-  String payload;
-  serializeJson(doc, payload);
-  String topic = "openiot/" + DEVICE_ID + "/state";
-  mqttClient.publish(topic.c_str(), payload.c_str());
+ String payload;
+ serializeJson(doc, payload);
+ String topic = "openiot/" + DEVICE_ID + "/state";
+ mqttClient.publish(topic.c_str(), payload.c_str());
 }
 ```
 
@@ -260,46 +260,46 @@ The dashboard **automatically renders** whatever JSON keys your device sends —
 
 The firmware responds to these MQTT commands from the dashboard:
 
-| Command   | Action                        |
+| Command | Action |
 |-----------|-------------------------------|
-| `ping`    | Device responds with state    |
-| `restart` | Reboots the ESP              |
-| `led_on`  | Turns on built-in LED        |
-| `led_off` | Turns off built-in LED       |
+| `ping` | Device responds with state |
+| `restart` | Reboots the ESP |
+| `led_on` | Turns on built-in LED |
+| `led_off` | Turns off built-in LED |
 
 ---
 
-## 🔌 API Reference
+## API Reference
 
 Full interactive API docs available at `http://localhost:8000/docs` (Swagger UI).
 
 ### Auth
-| Method | Endpoint             | Description            |
+| Method | Endpoint | Description |
 |--------|----------------------|------------------------|
-| POST   | `/api/auth/register` | Register new user      |
-| POST   | `/api/auth/login`    | Login (OAuth2 form)    |
-| GET    | `/api/auth/me`       | Get current user info  |
+| POST | `/api/auth/register` | Register new user |
+| POST | `/api/auth/login` | Login (OAuth2 form) |
+| GET | `/api/auth/me` | Get current user info |
 
 ### Devices
-| Method | Endpoint                        | Description               |
+| Method | Endpoint | Description |
 |--------|---------------------------------|---------------------------|
-| GET    | `/api/devices/`                 | List all user devices     |
-| POST   | `/api/devices/create`           | Create a new device       |
-| POST   | `/api/devices/adopt`            | Adopt device (ESP calls)  |
-| POST   | `/api/devices/{id}/command`     | Send command to device    |
-| GET    | `/api/devices/{id}`             | Get device details        |
-| DELETE | `/api/devices/{id}`             | Delete a device           |
+| GET | `/api/devices/` | List all user devices |
+| POST | `/api/devices/create` | Create a new device |
+| POST | `/api/devices/adopt` | Adopt device (ESP calls) |
+| POST | `/api/devices/{id}/command` | Send command to device |
+| GET | `/api/devices/{id}` | Get device details |
+| DELETE | `/api/devices/{id}` | Delete a device |
 
 ### Data
-| Method | Endpoint                       | Description                |
+| Method | Endpoint | Description |
 |--------|--------------------------------|----------------------------|
-| GET    | `/api/data/dashboard/stats`    | Dashboard statistics       |
-| GET    | `/api/data/{device_id}/history`| Sensor data history        |
-| GET    | `/api/data/{device_id}/latest` | Latest sensor readings     |
+| GET | `/api/data/dashboard/stats` | Dashboard statistics |
+| GET | `/api/data/{device_id}/history`| Sensor data history |
+| GET | `/api/data/{device_id}/latest` | Latest sensor readings |
 
 ---
 
-## 🛡️ Security
+## Security
 
 - Passwords hashed with **bcrypt** (12 rounds)
 - Authentication via **JWT** tokens (7-day expiry)
@@ -308,29 +308,29 @@ Full interactive API docs available at `http://localhost:8000/docs` (Swagger UI)
 
 ---
 
-## 🧰 Tech Stack
+## Tech Stack
 
-| Component     | Technology                          |
+| Component | Technology |
 |---------------|-------------------------------------|
-| Backend       | Python, FastAPI, SQLAlchemy         |
-| Database      | PostgreSQL (Supabase)               |
-| Auth          | JWT (python-jose), bcrypt           |
-| MQTT          | Paho MQTT, Mosquitto broker         |
-| Frontend      | Vanilla HTML/CSS/JS                 |
-| Real-time     | WebSocket + MQTT bridge             |
-| QR Codes      | qrcode + Pillow                     |
-| Firmware      | Arduino (ESP32/ESP8266)             |
-| Deployment    | Docker, docker-compose              |
+| Backend | Python, FastAPI, SQLAlchemy |
+| Database | PostgreSQL (Supabase) |
+| Auth | JWT (python-jose), bcrypt |
+| MQTT | Paho MQTT, Mosquitto broker |
+| Frontend | Vanilla HTML/CSS/JS |
+| Real-time | WebSocket + MQTT bridge |
+| QR Codes | qrcode + Pillow |
+| Firmware | Arduino (ESP32/ESP8266) |
+| Deployment | Docker, docker-compose |
 
 ---
 
-## 📄 License
+## License
 
 MIT License — use it however you want.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions welcome! Open an issue or submit a pull request.
 
